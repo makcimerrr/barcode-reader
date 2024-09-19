@@ -14,6 +14,7 @@ const BarcodeScanner = () => {
             .then(response => {
                 const cleanedData = cleanKeys(response.data);
                 setData(cleanedData);
+                stopScanner();
             })
             .catch(err => {
                 setError('PC non trouvé');
