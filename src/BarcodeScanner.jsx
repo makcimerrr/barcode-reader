@@ -1,6 +1,6 @@
 // src/BarcodeScanner.jsx
 import React, { useState } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode/minified/html5-qrcode.min';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 import axios from 'axios';
 
 const BarcodeScanner = () => {
