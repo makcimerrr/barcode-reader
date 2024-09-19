@@ -38,7 +38,18 @@ const BarcodeScanner = () => {
       {data && (
         <div>
           <h2>Données du PC :</h2>
-          <pre>{JSON.stringify(data, null, 2)}</pre>
+          <ul>
+            <li><strong>SN :</strong> {data.SN}</li>
+            <li><strong>Modèle :</strong> {data.Modèle}</li>
+            <li><strong>N° Chargeur :</strong> {data['N° Chargeur']}</li>
+            <li><strong>Propriétaire :</strong> {data.Propriétaire}</li>
+            <li><strong>Statut :</strong> {data.Statut}</li>
+            <li><strong>Garanti :</strong> {data.Garanti}</li>
+            <li><strong>Contrat :</strong> {data.Contrat}</li>
+            <li><strong>Commentaires :</strong> {data.Commentaires}</li>
+            <li><strong>Date Garantie :</strong> {data['Date Garantie']}</li>
+            <li><strong>Provenance :</strong> {data.Provenance}</li>
+          </ul>
         </div>
       )}
       {error && <p style={{ color: 'red' }}>{error}</p>}
