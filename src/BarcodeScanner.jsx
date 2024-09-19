@@ -1,43 +1,47 @@
 // src/BarcodeScanner.jsx
 import React, { useState } from 'react';
-import { Html5Qrcode } from 'html5-qrcode'; // Bibliothèque pour scanner le QR code
+import { Html5QrcodeScanner } from 'html5-qrcode/minified/html5-qrcode.min';
+import axios from 'axios';
 
 const BarcodeScanner = () => {
-  const [sn, setSN] = useState('');
   const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
 
-  const handleScan = () => {
-    const scanner = new Html5Qrcode("reader");
-    scanner.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      (decodedText) => {
-        setSN(decodedText);
-        fetchData(decodedText);
-        scanner.stop();
-      },
-      (errorMessage) => {
-        console.log("Erreur de scan: ", errorMessage);
-      }
-    );
+  const handleScanSuccess = (decodedText) => {
+    setError(null);
+    axios.get(`https://api-barcode-reader.vercel.app/api/hardware/${decodedText}`)
+      .then(response => {
+        setData(response.data);
+      })
+      .catch(err => {
+        setError('PC non trouvé');
+        setData(null);
+      });
   };
 
-  const fetchData = async (serialNumber) => {
-    try {
-      const response = await fetch(`/api/hardware/${serialNumber}`);
-      const result = await response.json();
-      setData(result);
-    } catch (error) {
-      console.error("Erreur de récupération des données : ", error);
-    }
+  const handleScanError = (error) => {
+    console.error('Scan error:', error);
   };
+
+  const startScanner = () => {
+    const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+    scanner.render(handleScanSuccess, handleScanError);
+  };
+
+  React.useEffect(() => {
+    startScanner();
+  }, []);
 
   return (
     <div>
-      <button onClick={handleScan}>Activer la caméra et scanner le code-barres</button>
-      <div id="reader"></div>
-      {sn && <p>SN Scanné : {sn}</p>}
-      {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
+      <div id="reader" style={{ width: '100%' }}></div>
+      {data && (
+        <div>
+          <h2>Données du PC :</h2>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
+        </div>
+      )}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 };
