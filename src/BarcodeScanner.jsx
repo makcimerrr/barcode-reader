@@ -1,7 +1,18 @@
 // src/BarcodeScanner.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import axios from 'axios';
+
+// Fonction pour nettoyer les clés des objets
+const cleanKeys = (data) => {
+  const cleanedData = {};
+  Object.keys(data).forEach((key) => {
+    // Nettoie les guillemets et les caractères invisibles
+    const cleanedKey = key.replace(/["\u200B-\u200D\uFEFF]/g, "").trim();
+    cleanedData[cleanedKey] = data[key];
+  });
+  return cleanedData;
+};
 
 const BarcodeScanner = () => {
   const [data, setData] = useState(null);
@@ -11,7 +22,9 @@ const BarcodeScanner = () => {
     setError(null);
     axios.get(`https://api-barcode-reader.vercel.app/api/hardware/${decodedText}`)
       .then(response => {
-        setData(response.data);
+        // Nettoie les clés des données avant de les afficher
+        const cleanedData = cleanKeys(response.data);
+        setData(cleanedData);
       })
       .catch(err => {
         setError('PC non trouvé');
@@ -28,7 +41,7 @@ const BarcodeScanner = () => {
     scanner.render(handleScanSuccess, handleScanError);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     startScanner();
   }, []);
 
